@@ -1,4 +1,5 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Logger, Injectable } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
@@ -10,9 +11,12 @@ import ConnectionArgs, {
 import { connectionFromArraySlice } from 'graphql-relay';
 import { ListUsersResponse } from './dto/list.users.response';
 
+const fileName = `users.resolver.ts`;
+
 @Resolver(() => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
+  private readonly logger = new Logger(fileName);
 
   @Mutation(() => User)
   createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
@@ -21,6 +25,7 @@ export class UsersResolver {
 
   @Query(() => [User], { name: 'users' })
   findAll(@Args('listUsersInput') listUsersInput: ListUsersInput) {
+    this.logger.log('Doing something...');
     return this.usersService.findAll(listUsersInput);
   }
 

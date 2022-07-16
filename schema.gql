@@ -26,9 +26,14 @@ input CreateUserInput {
   """last name of the user"""
   lastName: String!
 
-  """role of the user"""
-  role: String!
+  """Users password"""
+  password: String!
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 input ListUsersInput {
   """classical limit"""
@@ -73,24 +78,33 @@ input UpdateUserInput {
   """last name of the user"""
   lastName: String
 
-  """role of the user"""
-  role: String
+  """Users password"""
+  password: String
 }
 
 type User {
   _id: String!
 
-  """User email """
+  """User createAt"""
+  createdAt: DateTime!
+
+  """User email"""
   email: String!
 
-  """User firstName """
+  """User firstName"""
   firstName: String!
 
-  """User lastName """
+  """User lastName"""
   lastName: String!
 
-  """User role"""
-  role: String!
+  """User password"""
+  password: String!
+
+  """User Role"""
+  role: ID!
+
+  """User status Active/Deactive"""
+  status: Float!
 }
 
 type UserConnection {
