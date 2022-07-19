@@ -5,6 +5,9 @@ import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { ListUsersInput } from './dto/list-users.input';
+import { LoggedUserOutput } from './dto/logged-user.output';
+import { LoginUserInput } from './dto/ login-user.input';
+
 import ConnectionArgs, {
   getPagingParameters,
 } from '../common/relay/connection.args';
@@ -19,8 +22,9 @@ export class UsersResolver {
   private readonly logger = new Logger(fileName);
 
   @Mutation(() => User)
-  createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
-    return this.usersService.create(createUserInput);
+  async createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
+    let newUser =  await this.usersService.create(createUserInput);
+    return newUser;
   }
 
   @Query(() => [User], { name: 'users' })
@@ -51,6 +55,12 @@ export class UsersResolver {
     return this.usersService.findOne(id);
   }
 
+
+  @Query(() => User, { name: 'user' })
+  findOneByEmail(@Args('email', { type: () => String }) email: string) {
+    return this.usersService.findOneByEmail(email);
+  }
+
   @Mutation(() => User)
   updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
     return this.usersService.update(updateUserInput._id, updateUserInput);
@@ -60,4 +70,10 @@ export class UsersResolver {
   removeUser(@Args('_id', { type: () => String }) id: string) {
     return this.usersService.remove(id);
   }
+
+  @Mutation(() => LoggedUserOutput)
+  loginUser(@Args('loginUserInput') loginUserInput: LoginUserInput) {
+    return this.usersService.loginUser(loginUserInput);
+  }
+
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
@@ -6,23 +6,48 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ListUsersInput } from './dto/list-users.input';
 import { Logger } from '@nestjs/common';
-import { bcrypt } from 'bcrypt';
+import * as bcrypt from 'bcrypt';
+import { AuthService } from '../common/services/auth.service';
+import { LoginUserInput } from './dto/ login-user.input';
+import { Hash } from 'crypto';
 
 const fileName = `users.service.ts`;
+enum HASH{
+  SALTORROUNDS = 10
+}
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel(User.name)
+    @InjectModel('User')
+    @Inject(forwardRef(() => AuthService))
     private readonly userModel: Model<User>,
+    private readonly authService: AuthService,
     ) {}
   private readonly logger = new Logger(fileName)
     
-  create(createUserInput: CreateUserInput) {
+  async create(createUserInput: CreateUserInput) {
     this.logger.debug(`createUserInput called`, createUserInput);
+    const password = createUserInput.password;
+    createUserInput.password = await bcrypt.hash(password, HASH.SALTORROUNDS);
+    console.log(HASH.SALTORROUNDS  , "this is value");
     const user = new this.userModel(createUserInput);
     return user.save();
   }
+
+  async loginUser(loginUserInput: LoginUserInput) {
+    const user = await this.authService.validateUser(
+      loginUserInput.email,
+      loginUserInput.password,
+    );
+    console.log(user ,'this is user')
+    if (!user) {
+      throw new BadRequestException(`Email or password are invalid`);
+    } else {
+      return this.authService.generateUserCredentials(user);
+    }
+  }
+  
 
   findAll(paginationQuery: ListUsersInput) {
     const { limit, offset } = paginationQuery;
@@ -36,6 +61,11 @@ export class UsersService {
     }
     return user;
   }
+
+ async findOneByEmail(email: string){
+    const user = await this.userModel.findOne({email:email});
+    return user;
+ }
 
   async update(id: string, updateUserInput: UpdateUserInput) {
     const existingUser = await this.userModel
