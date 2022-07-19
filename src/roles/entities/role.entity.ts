@@ -3,8 +3,10 @@ import mongoose, { Schema as MongooseSchema, Document} from "mongoose";
 import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose'
 
 export enum PossibleRole {
+    SUPERADMIN = 'SUPERADMIN',
     ADMIN = 'ADMIN',
-    USER = 'USER'
+    USER = 'USER',
+    PROJECTOWNER = 'PROJECTOWNER'
 }
 
 @Schema()
