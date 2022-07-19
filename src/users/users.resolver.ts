@@ -7,6 +7,9 @@ import { UpdateUserInput } from './dto/update-user.input';
 import { ListUsersInput } from './dto/list-users.input';
 import { LoggedUserOutput } from './dto/logged-user.output';
 import { LoginUserInput } from './dto/ login-user.input';
+import { UseGuards } from '@nestjs/common';
+import {JwtAuthGuard} from '../common/auth/jwt-auth.guard';
+
 
 import ConnectionArgs, {
   getPagingParameters,
@@ -33,6 +36,7 @@ export class UsersResolver {
     return this.usersService.findAll(listUsersInput);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Query(() => ListUsersResponse, { name: 'listUsersWithCursor' })
   async findAllWithCursor(
     @Args('args') args: ConnectionArgs,

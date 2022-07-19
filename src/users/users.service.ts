@@ -7,7 +7,7 @@ import { Model } from 'mongoose';
 import { ListUsersInput } from './dto/list-users.input';
 import { Logger } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { AuthService } from '../common/services/auth.service';
+import { AuthService } from '../common/auth/services/auth.service';
 import { LoginUserInput } from './dto/ login-user.input';
 import { Hash } from 'crypto';
 
